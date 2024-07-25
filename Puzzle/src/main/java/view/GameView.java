@@ -13,7 +13,7 @@ public class GameView extends View {
     For testing purposes we add a skip button that can end the game at any point
     It can be turned off by making the testing variable false
     */
-    boolean testing=false;
+    boolean testing=true;
     public JButton skipButton= createButton("Skip for Testing");;
     public GameView(Controller controller,int n,String username) {
 

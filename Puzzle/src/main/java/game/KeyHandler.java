@@ -17,19 +17,13 @@ public class KeyHandler implements KeyListener {
         if(code==KeyEvent.VK_UP){
             this.up=true;
         }
-
-
-        if(code==KeyEvent.VK_DOWN){
+        else if(code==KeyEvent.VK_DOWN){
             this.down=true;
         }
-
-
-        if(code==KeyEvent.VK_LEFT){
+        else if(code==KeyEvent.VK_LEFT){
             this.left=true;
         }
-
-
-        if(code==KeyEvent.VK_RIGHT){
+        else if(code==KeyEvent.VK_RIGHT){
             this.right=true;
         }
     }
