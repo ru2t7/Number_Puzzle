@@ -1,13 +1,10 @@
 package view;
 
 
-import game.GamePanel;
 import controller.*;
 import model.Game;
 
 import javax.swing.*;
-import javax.swing.border.AbstractBorder;
-import javax.swing.border.Border;
 import java.awt.*;
 
 public class EndOfGameView extends View {

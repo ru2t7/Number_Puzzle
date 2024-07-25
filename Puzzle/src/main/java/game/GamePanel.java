@@ -6,7 +6,6 @@ import model.Game;
 
 import javax.swing.*;
 import java.awt.*;
-import java.sql.Array;
 import java.util.*;
 
 import static java.lang.System.nanoTime;
@@ -20,10 +19,7 @@ public class GamePanel extends JPanel implements Runnable {
     private final Color tileColor = new Color(157, 201, 237);
     private final String[] sortedStrings; //Used to compare with current board to identify when the tiles are sorted
     Controller controller;
-    public String username;
-    public int numberOfMoves = 0;
-    public long time = 0;
-    public int n; // The dimension of the board, aka. 3x3/4x4/5x5
+    Game game;
     public boolean end = false; //Variable for interrupting the game, used for testing purposes
     public final int tileSize = 150; // Tile pixel size
     public int screenWidth;
@@ -39,10 +35,11 @@ public class GamePanel extends JPanel implements Runnable {
     public GamePanel(Controller controller, int n, String username) {
 
         this.controller = controller;
-        this.n = n;
+        //this.n = n;
         screenWidth = n * tileSize;
         screenHeight = n * tileSize;
-        this.username = username;
+        this.game=new Game(username, 0,0,n);
+        //this.username = username;
         this.tiles = new TreeMap<>();
         fillRandomTiles();
         this.setFocusable(true);
@@ -69,7 +66,7 @@ public class GamePanel extends JPanel implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("Sorted strings: " + Arrays.toString(sortedStrings) + "\n Game strings: " + tiles.values().toString());
+        System.out.println("Sorted strings: " + Arrays.toString(sortedStrings) + "\n Game strings: " + tiles.values());
         long startTime = nanoTime();
         while (gameThread != null) {
             if (tiles.values().toString().equals(Arrays.toString(sortedStrings)) || end) {
@@ -80,8 +77,8 @@ public class GamePanel extends JPanel implements Runnable {
             repaint();
         }
         long endTime = nanoTime();
-        time = endTime - startTime;
-        controller.openEndOfGame(new Game(username, numberOfMoves, (double) time / 1000000000, n));
+        game.time = (double)(endTime - startTime)/1000000000;
+        controller.openEndOfGame(game);
 
     }
 
@@ -128,11 +125,11 @@ public class GamePanel extends JPanel implements Runnable {
         for(Map.Entry entry: tiles.entrySet()){
             g2.setColor(tileColor);
             Coordinates coordinates=(Coordinates) entry.getKey();
-            g2.fillRect(coordinates.getY() + 5, coordinates.getX() + 5, tileSize - 10, tileSize - 10);
+            g2.fillRect(coordinates.y() + 5, coordinates.x() + 5, tileSize - 10, tileSize - 10);
             g2.setColor(Color.BLACK);
             String string = (String)entry.getValue();
             g2.setFont(new Font("Monospaced", Font.BOLD, 20));
-            g2.drawString(string, coordinates.getY() + tileSize / 2, coordinates.getX() + tileSize / 2);
+            g2.drawString(string, coordinates.y() + tileSize / 2, coordinates.x() + tileSize / 2);
         }
         g2.dispose();
     }
@@ -150,7 +147,7 @@ public class GamePanel extends JPanel implements Runnable {
         tiles.replace(newCoordinates, replaceValue, " ");
         tileOX = tileOX + i * tileSize;
         tileOY = tileOY + j * tileSize;
-        numberOfMoves++;
+        game.numberOfMoves++;
     }
     /*
     In order to generate a random new board we will start with a sorted board, shuffle it, and check
@@ -167,15 +164,15 @@ public class GamePanel extends JPanel implements Runnable {
         if (!strings.get(0).equals(" ") && !strings.get(1).equals(" ")) {
             Collections.swap(strings, 0, 1);
         } else {
-            Collections.swap(strings, n * n - 2, n * n - 1);
+            Collections.swap(strings, game.n * game.n - 2, game.n * game.n - 1);
         }
     }
     public int getRowNumberFromBelow(int emptyTilePosition) {
-        var row = emptyTilePosition / n;
-        return n - row;
+        var row = emptyTilePosition / game.n;
+        return game.n - row;
     }
     public boolean isSlidePuzzleSolvable(int numberOfInversions, int emptyTilePosition) {
-        if (n % 2 != 0)
+        if (game.n % 2 != 0)
             return (numberOfInversions % 2 == 0);
 
         int rowNumber = getRowNumberFromBelow(emptyTilePosition);
@@ -188,31 +185,31 @@ public class GamePanel extends JPanel implements Runnable {
     private void fillRandomTiles() {
         ArrayList<String> strings = new ArrayList<>();
         int m = 0;
-        for (int i = 0; i < n; i++)
-            for (int j = 0; j < n; j++)
-                strings.add(m++, String.valueOf(i * n + j + 1));
-        strings.set(n * n - 1, " ");
+        for (int i = 0; i < game.n; i++)
+            for (int j = 0; j < game.n; j++)
+                strings.add(m++, String.valueOf(i * game.n + j + 1));
+        strings.set(game.n * game.n - 1, " ");
         Collections.shuffle(strings);
 
-        int numberInverions = 0;
-        for (int i = 0; i < n * n - 1; i++) {
+        int numberInversions = 0;
+        for (int i = 0; i < game.n * game.n - 1; i++) {
             if (strings.get(i).equals(" ")) {
                 m = i;
                 continue;
             }
 
-            for (int j = i + 1; j < n * n; j++)
+            for (int j = i + 1; j < game.n * game.n; j++)
                 if ((!strings.get(j).equals(" "))&& Integer.parseInt(strings.get(j)) < Integer.parseInt(strings.get(i)))
-                    numberInverions++;
+                    numberInversions++;
         }
 
-        if (!isSlidePuzzleSolvable(numberInverions, m))
+        if (!isSlidePuzzleSolvable(numberInversions, m))
             swapTilesInSlidePuzzle(strings);
 
 
         m = 0;
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
+        for (int i = 0; i < game.n; i++) {
+            for (int j = 0; j < game.n; j++) {
                 if(strings.get(m).equals(" ")) {
                     tileOY = j* tileSize;
                     tileOX = i * tileSize;

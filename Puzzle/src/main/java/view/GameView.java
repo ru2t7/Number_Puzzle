@@ -2,7 +2,6 @@ package view;
 
 import game.GamePanel;
 import controller.*;
-import model.Game;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,7 +13,7 @@ public class GameView extends View {
     It can be turned off by making the testing variable false
     */
     boolean testing=true;
-    public JButton skipButton= createButton("Skip for Testing");;
+    public JButton skipButton= createButton("Skip for Testing");
     public GameView(Controller controller,int n,String username) {
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

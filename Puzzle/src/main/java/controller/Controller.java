@@ -1,13 +1,11 @@
 package controller;
 
-import game.GamePanel;
 import model.Game;
 import view.ChoseView;
 import view.EndOfGameView;
 import view.GameView;
 import view.RankingView;
 
-import javax.swing.*;
 import java.util.*;
 
     /*
@@ -25,7 +23,7 @@ public class Controller {
     GameView gameView;
 
     public Controller(){
-        rankings=new HashMap<Integer,List<Object>>();
+        rankings=new HashMap<>();
     }
 
     /*
@@ -93,18 +91,15 @@ public class Controller {
     */
     public void addRanking(Game game) {
         if(!rankings.containsKey(game.n))
-            rankings.put(game.n,new ArrayList<Object>());
+            rankings.put(game.n,new ArrayList<>());
         rankings.get(game.n).add(game);
-        rankings.get(game.n).sort(new Comparator<Object>() {
-            @Override
-            public int compare(Object o1, Object o2) {
-                Game g1=(Game)o1;
-                Game g2=(Game)o2;
-                int moves=Integer.compare(g1.numberOfMoves,g2.numberOfMoves);
-                if (moves!=0)
-                    return moves;
-                return Double.compare(g1.time,g2.time);
-            }
+        rankings.get(game.n).sort((o1, o2) -> {
+            Game g1=(Game)o1;
+            Game g2=(Game)o2;
+            int moves=Integer.compare(g1.numberOfMoves,g2.numberOfMoves);
+            if (moves!=0)
+                return moves;
+            return Double.compare(g1.time,g2.time);
         });
 
     }
